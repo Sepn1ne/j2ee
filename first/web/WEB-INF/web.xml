@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         id="WebApp_ID" version="4.0">
+
+    <!--将请求路径与Servlet对应-->
+    <servlet>
+        <servlet-name>finder</servlet-name>
+        <servlet-class>first.FinderServlet</servlet-class>
+        <!--init-param面对应的参数名和值，是给servlet在初始化执行init()方法的时候(servlet有doGet doPost 在这之前还有init()方法 )。
+        可以在init()方法里调用这个参数的值-->
+        <init-param>
+            <param-name>contacts</param-name>
+            <param-value>1.xlsx，2.xlsx</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>finder</servlet-name>
+        <url-pattern>/find</url-pattern>
+    </servlet-mapping>
+
+
+</web-app>

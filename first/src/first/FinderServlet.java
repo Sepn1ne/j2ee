@@ -137,9 +137,6 @@ public class FinderServlet extends HttpServlet {
 		//获取浏览器传参
 		String param = request.getParameter("param");
 		PrintWriter out = response.getWriter();
-		//使用正则表达式判断输入的参数类型
-		//姓名的正则表达式
-		// String pName="^[\u4e00-\u9fa5]{2,6}$";
 
 
 		for(Map<String, Object> map:contacts){
@@ -148,13 +145,13 @@ public class FinderServlet extends HttpServlet {
 				String id=(String)map.get("id");
 				String name=(String)map.get("name");
 				String gender=(String)map.get("gender");
-				String styClass=(String)map.get("class");
+				String strClass=(String)map.get("class");
 				String mobile=(String)map.get("mobile");
 				String email=(String)map.get("email");
 				out.write("id: "+id+"<br>");
 				out.write("name: "+name+"<br>");
 				out.write("gender: "+gender+"<br>");
-				out.write("styClass: "+styClass+"<br>");
+				out.write("strClass: "+strClass+"<br>");
 				out.write("mobile: "+mobile+"<br>");
 				out.write("email: "+email+"<br>");
 			}

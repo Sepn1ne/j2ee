@@ -8,6 +8,8 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 
+import first.bean.Page;
+import first.bean.Student;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.*;
@@ -20,18 +22,19 @@ import org.apache.poi.ss.usermodel.Workbook;
 public class FinderServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	// contact table£¬´æ·ÅËùÓĞexcel±íµÄËùÓĞĞĞÊı¾İ
+	// contact tableï¼Œå­˜æ”¾æ‰€æœ‰excelè¡¨çš„æ‰€æœ‰è¡Œæ•°æ®
 	private List<Map<String, Object>> contacts = new ArrayList<Map<String, Object>>();
-	//ÖØĞ´ÁËGenericServletµÄinit·½·¨
+	//é‡å†™äº†GenericServletçš„initæ–¹æ³•
+	//init()æ–¹æ³•åœ¨æ‰§è¡Œæ„é€ å‡½æ•°
 	public void init() throws ServletException {
 		try {
-			//¶ÁÈ¡xmlÎÄ¼şÖĞµÄinit-paramµÄÄÚÈİ
+			//è¯»å–xmlæ–‡ä»¶ä¸­çš„init-paramçš„å†…å®¹
 			String files = getInitParameter("contacts");
-			//È¡³ö×Ö·û´®Ç°ºó¿Õ¸ñ
+			//å–å‡ºå­—ç¬¦ä¸²å‰åç©ºæ ¼
 			files = files.trim();
-			files = files.replace('£¬', ',');
+			files = files.replace('ï¼Œ', ',');
 			String[] file_name_array = files.split(",");
-			//±éÀú³õÊ¼»¯²ÎÊı¶ÔÓ¦µÄxlsxÎÄ¼ş
+			//éå†åˆå§‹åŒ–å‚æ•°å¯¹åº”çš„xlsxæ–‡ä»¶
 			for (int i = 0; i < file_name_array.length; i++) {
 				String file_name = file_name_array[i];
 				file_name = file_name.trim();
@@ -60,10 +63,10 @@ public class FinderServlet extends HttpServlet {
 
 				//Get the Sheet object at the given index.
 				Sheet sheetAt = book.getSheetAt(0);
-				//±éÀú¸ÃsheetµÄÃ¿Ò»ĞĞ
+				//éå†è¯¥sheetçš„æ¯ä¸€è¡Œ
 				for (Row row : sheetAt) {
 					//Get row number this row represents
-					//Ìø¹ıµÚ0ĞĞ£¬ÒòÎªµÚ0ĞĞÊÇÁĞÃû
+					//è·³è¿‡ç¬¬0è¡Œï¼Œå› ä¸ºç¬¬0è¡Œæ˜¯åˆ—å
 					if (row.getRowNum() == 0) {
 						continue;
 					}
@@ -71,49 +74,55 @@ public class FinderServlet extends HttpServlet {
 					if (row == null) {
 						break;
 					}
-					//»ñÈ¡µÚ0¸öµ¥Ôª¸ñ
+					//è·å–ç¬¬0ä¸ªå•å…ƒæ ¼
 					Cell cell = row.getCell(0);
 
 					if (cell == null) {
 						break;
 					}
-					//»ñÈ¡µÚ0¸öµ¥Ôª¸ñµÄÄÚÈİ×÷ÎªÊı×Ö·µ»Ø£¬Èç¹û²»ÊÇÊı×Ö£¬Å×³öÒì³£
+					//è·å–ç¬¬0ä¸ªå•å…ƒæ ¼çš„å†…å®¹ä½œä¸ºæ•°å­—è¿”å›ï¼Œå¦‚æœä¸æ˜¯æ•°å­—ï¼ŒæŠ›å‡ºå¼‚å¸¸
 					double no = row.getCell(0).getNumericCellValue();
 					String id = row.getCell(1).getStringCellValue();
 					String name = row.getCell(2).getStringCellValue();
 					String strClass = "";
 					String mobile = "";
 					String email = "";
-					//°à¼¶×Ö¶Î
+					//ç­çº§å­—æ®µ
 					cell = row.getCell(3);
 					if (cell != null) {
 						strClass = cell.getStringCellValue();
 					}
-					//µç»°×Ö¶Î
+					//ç”µè¯å­—æ®µ
 					cell = row.getCell(4);
 					if (cell != null) {
-						//ÉèÖÃ¸Ãµ¥Ôª¸ñµÄÊôĞÔ£¬ÒÑ¹ıÊ±
+						//è®¾ç½®è¯¥å•å…ƒæ ¼çš„å±æ€§ï¼Œå·²è¿‡æ—¶
 						cell.setCellType(CellType.STRING);
 						mobile = cell.getStringCellValue();
 					}
-					//ÓÊÏä×Ö¶Î
+					//é‚®ç®±å­—æ®µ
 					cell = row.getCell(5);
 					if (cell != null) {
 						cell.setCellType(CellType.STRING);
 						email = cell.getStringCellValue();
 					}
 
-					//½«¸ÄĞĞµÄËùÓĞÔªËØ·ÅÈëµ½Map¼¯ºÏ
+					//å°†æ”¹è¡Œçš„æ‰€æœ‰å…ƒç´ æ”¾å…¥åˆ°Mapé›†åˆ
 					Map<String, Object> record = new HashMap<String, Object>();
 					record.put("id", id);
-					record.put("name", name);
-					//Èç¹ûĞÕÃû×îºóÒ»¸ö×Ö·ûÊÇ*£¬ÔòÊÇÅ®º¢
-					String gender=name.charAt(name.length()-1)=='*'?"Å®º¢":"ÄĞº¢";
+
+					//å¦‚æœå§“åæœ€åä¸€ä¸ªå­—ç¬¦æ˜¯*ï¼Œåˆ™æ˜¯å¥³å­©
+					String gender=name.charAt(name.length()-1)=='*'?"å¥³å­©":"ç”·å­©";
 					record.put("gender", gender);
+					if("å¥³å­©".equals(gender)){
+						record.put("name", name.substring(0,name.length()-1));
+					}else if("ç”·å­©".equals(gender)){
+						record.put("name",name);
+					}
+
 					record.put("class", strClass);
 					record.put("mobile", mobile);
 					record.put("email", email);
-					//½«map¼¯ºÏ¼ÓÈëµ½List¼¯ºÏ
+					//å°†mapé›†åˆåŠ å…¥åˆ°Listé›†åˆ
 					contacts.add(record);
 
 				}
@@ -129,34 +138,75 @@ public class FinderServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		//ÉèÖÃ±íµ¥Ìá½»µÄ²ÎÊıÀàĞÍ
+		//è®¾ç½®è¡¨å•æäº¤çš„å‚æ•°ç±»å‹
 		request.setCharacterEncoding("utf-8");
-		//ÉèÖÃÏàÓ¦µ½ä¯ÀÀÆ÷µÄ±àÂëÀàĞÍ
-		//Ê¹ÓÃutf-8µÄ¼æÈİĞÔ½ÏºÃ
+		//è®¾ç½®ç›¸åº”åˆ°æµè§ˆå™¨çš„ç¼–ç ç±»å‹
+		//ä½¿ç”¨utf-8çš„å…¼å®¹æ€§è¾ƒå¥½
 		response.setContentType("text/html;charset=utf-8");
-		//»ñÈ¡ä¯ÀÀÆ÷´«²Î
+		//è·å–æµè§ˆå™¨ä¼ å‚
 		String param = request.getParameter("param");
-		PrintWriter out = response.getWriter();
+		// PrintWriter out = response.getWriter();
+		List<Student> res=new ArrayList<>();
 
-
+		//éå†æ¯ä¸ªå­¦ç”Ÿ
 		for(Map<String, Object> map:contacts){
-			if(map.containsValue(param)){
-				//¼ìË÷µÄ½á¹û°üÀ¨Ñ§ÉúµÄÑ§ºÅ£¬ĞÕÃû£¬ĞÔ±ğ£¬°à¼¶£¬ÊÖ»úºÅÂë£¬ÓÊ¼şµØÖ·¡£
-				String id=(String)map.get("id");
-				String name=(String)map.get("name");
-				String gender=(String)map.get("gender");
-				String strClass=(String)map.get("class");
-				String mobile=(String)map.get("mobile");
-				String email=(String)map.get("email");
-				out.write("id: "+id+"<br>");
-				out.write("name: "+name+"<br>");
-				out.write("gender: "+gender+"<br>");
-				out.write("strClass: "+strClass+"<br>");
-				out.write("mobile: "+mobile+"<br>");
-				out.write("email: "+email+"<br>");
+			// if(map.containsValue(param)){
+			// 	//æ£€ç´¢çš„ç»“æœåŒ…æ‹¬å­¦ç”Ÿçš„å­¦å·ï¼Œå§“åï¼Œæ€§åˆ«ï¼Œç­çº§ï¼Œæ‰‹æœºå·ç ï¼Œé‚®ä»¶åœ°å€ã€‚
+			// 	String id=(String)map.get("id");
+			// 	String name=(String)map.get("name");
+			// 	String gender=(String)map.get("gender");
+			// 	String strClass=(String)map.get("class");
+			// 	String mobile=(String)map.get("mobile");
+			// 	String email=(String)map.get("email");
+			// 	out.write("id: "+id+"<br>");
+			// 	out.write("name: "+name+"<br>");
+			// 	out.write("gender: "+gender+"<br>");
+			// 	out.write("strClass: "+strClass+"<br>");
+			// 	out.write("mobile: "+mobile+"<br>");
+			// 	out.write("email: "+email+"<br>");
+			// }
+			//éå†æ¯ä¸ªå­¦ç”Ÿçš„æ¯ä¸ªå±æ€§
+			for(Object val:map.values()){
+				String sv=(String)val;
+				int i = sv.indexOf(param);
+				if(i!=-1){
+					String id=(String)map.get("id");
+					String name=(String)map.get("name");
+					String gender=(String)map.get("gender");
+					String strClass=(String)map.get("class");
+					String mobile=(String)map.get("mobile");
+					String email=(String)map.get("email");
+					Student student = new Student(id, name, gender, strClass, mobile, email);
+					res.add(student);
+				}
 			}
 		}
-		out.close();
+		// out.close();
+
+		//å°†é›†åˆè½¬ä¸ºæ•°ç»„ï¼Œæ–¹ä¾¿ä½¿ç”¨foreachè¿›è¡Œå¾ªç¯
+		Student [] res2 = res.toArray(new Student[0]);
+		int currentPage=0;
+		int count=10;
+		//è·å–è¿æ¥ä¸­çš„å½“å‰é¡µæ•°å’Œä¸€å…±é¡µæ•°
+		String current = request.getParameter("currentPage");
+		String countString = request.getParameter("count");
+		if(current!=null){
+			currentPage=Integer.parseInt(current);
+		}
+		if(countString!=null){
+			count=Integer.parseInt(countString);
+		}
+		currentPage =currentPage>=0?currentPage:0;
+		count =count>=0?count:10;
+
+
+		Page page = new Page(res2.length,currentPage,count,currentPage+count-1);
+		//å°†ç»“æœå†™å…¥åˆ°requestè¯·æ±‚åŸŸ
+		request.setAttribute("res",res2);
+		request.setAttribute("page",page);
+
+		//è½¬å‘
+		request.getRequestDispatcher("/page.jsp").forward(request,response);
 
 
 	}
